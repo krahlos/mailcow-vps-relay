@@ -62,6 +62,5 @@ smtpd_recipient_restrictions =
 header_checks = regexp:/etc/postfix/header_checks
 
 # -------------------------------------------------------
-# Logging
+# Logging — syslog (entrypoint starts syslogd → /var/log/postfix/mail.log)
 # -------------------------------------------------------
-maillog_file = /dev/stdout
