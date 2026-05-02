@@ -33,13 +33,12 @@ message_size_limit = ${MESSAGE_SIZE_LIMIT}
 mailbox_size_limit = 0
 
 # -------------------------------------------------------
-# TLS (inbound)
-# Optional – mount certificate via Certbot/Traefik
+# TLS (inbound) — enabled at runtime if cert exists
 # -------------------------------------------------------
-# smtpd_tls_cert_file = /etc/letsencrypt/live/${RELAY_HOSTNAME}/fullchain.pem
-# smtpd_tls_key_file  = /etc/letsencrypt/live/${RELAY_HOSTNAME}/privkey.pem
-# smtpd_tls_security_level = may
-# smtpd_tls_loglevel = 1
+##TLS## smtpd_tls_cert_file = /etc/letsencrypt/live/${RELAY_HOSTNAME}/fullchain.pem
+##TLS## smtpd_tls_key_file  = /etc/letsencrypt/live/${RELAY_HOSTNAME}/privkey.pem
+##TLS## smtpd_tls_security_level = may
+##TLS## smtpd_tls_loglevel = 1
 
 # -------------------------------------------------------
 # TLS (outbound to Mailcow)

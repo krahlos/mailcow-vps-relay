@@ -11,9 +11,25 @@ services:
       - ./postfix/transport.tmpl:/etc/postfix/transport.tmpl:ro
       - ./postfix/helo_access:/etc/postfix/helo_access:ro
       - ./postfix/header_checks:/etc/postfix/header_checks:ro
+      - letsencrypt:/etc/letsencrypt:ro
       - postfix-queue:/var/spool/postfix
       - postfix-logs:/var/log/postfix
+    depends_on:
+      - certbot
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "0.0.0.0:80:80"
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - ./certbot/renew.sh:/renew.sh:ro
+    entrypoint: ["/bin/sh", "/renew.sh"]
 
 volumes:
   postfix-queue:
   postfix-logs:
+  letsencrypt:
