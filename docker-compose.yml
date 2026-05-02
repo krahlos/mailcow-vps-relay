@@ -1,7 +1,7 @@
 services:
   postfix:
     build: ./postfix
-    container_name: mail-relay
+    container_name: mailcow-vps-relay-postfix
     restart: unless-stopped
     env_file: .env
     ports:
@@ -19,7 +19,7 @@ services:
 
   certbot:
     image: certbot/certbot:v5.5.0
-    container_name: certbot
+    container_name: mailcow-vps-relay-certbot
     restart: unless-stopped
     env_file: .env
     ports:
@@ -31,7 +31,7 @@ services:
 
   postfix-exporter:
     image: ghcr.io/hsn723/postfix_exporter:0.19.0
-    container_name: postfix-exporter
+    container_name: mailcow-vps-relay-postfix-exporter
     restart: unless-stopped
     command:
       - --postfix.logfile_path=/var/log/postfix/mail.log
