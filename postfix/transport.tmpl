@@ -1,0 +1,3 @@
+# Format: domain    smtp:[target-ipv6]:port
+# Brackets around IPv6 prevent Postfix from treating it as a hostname
+${RELAY_DOMAINS}    smtp:[${MAILCOW_IPV6}]:${MAILCOW_PORT}

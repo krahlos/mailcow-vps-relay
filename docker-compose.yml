@@ -1,0 +1,19 @@
+services:
+  postfix:
+    build: ./postfix
+    container_name: mail-relay
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "0.0.0.0:25:25"
+      - "[::]:25:25"
+    volumes:
+      - ./postfix/transport.tmpl:/etc/postfix/transport.tmpl:ro
+      - ./postfix/helo_access:/etc/postfix/helo_access:ro
+      - ./postfix/header_checks:/etc/postfix/header_checks:ro
+      - postfix-queue:/var/spool/postfix
+      - postfix-logs:/var/log/postfix
+
+volumes:
+  postfix-queue:
+  postfix-logs:

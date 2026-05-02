@@ -1,0 +1,5 @@
+# Keep relay's Received headers, do not leak internal IPs
+# (Mailcow handles the rest)
+/^Received: from \[192\.168\./     IGNORE
+/^Received: from \[10\./           IGNORE
+/^Received: from \[172\.(1[6-9]|2[0-9]|3[01])\./  IGNORE

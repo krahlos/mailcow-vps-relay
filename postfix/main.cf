@@ -1,0 +1,68 @@
+# -------------------------------------------------------
+# Basic configuration
+# -------------------------------------------------------
+myhostname = ${RELAY_HOSTNAME}
+myorigin = ${RELAY_HOSTNAME}
+mydomain = ${RELAY_HOSTNAME}
+
+# No local delivery – pure relay
+mydestination =
+local_recipient_maps =
+local_transport = error: local mail delivery is disabled
+
+# Network interfaces (all)
+inet_interfaces = all
+inet_protocols = all
+
+# -------------------------------------------------------
+# Relay configuration
+# -------------------------------------------------------
+# Which domains are accepted?
+relay_domains = ${RELAY_DOMAINS}
+
+# Transport map: domain → target MTA
+transport_maps = hash:/etc/postfix/transport
+
+# Trusted networks (localhost only, no open relay!)
+mynetworks = 127.0.0.0/8 [::1]/128
+
+# -------------------------------------------------------
+# Limits
+# -------------------------------------------------------
+message_size_limit = ${MESSAGE_SIZE_LIMIT}
+mailbox_size_limit = 0
+
+# -------------------------------------------------------
+# TLS (inbound)
+# Optional – mount certificate via Certbot/Traefik
+# -------------------------------------------------------
+# smtpd_tls_cert_file = /etc/letsencrypt/live/${RELAY_HOSTNAME}/fullchain.pem
+# smtpd_tls_key_file  = /etc/letsencrypt/live/${RELAY_HOSTNAME}/privkey.pem
+# smtpd_tls_security_level = may
+# smtpd_tls_loglevel = 1
+
+# -------------------------------------------------------
+# TLS (outbound to Mailcow)
+# -------------------------------------------------------
+smtp_tls_security_level = may
+smtp_tls_loglevel = 1
+
+# -------------------------------------------------------
+# Basic anti-spam (avoid generating backscatter)
+# -------------------------------------------------------
+smtpd_helo_required = yes
+smtpd_helo_restrictions =
+    check_helo_access hash:/etc/postfix/helo_access,
+    permit
+
+smtpd_recipient_restrictions =
+    permit_mynetworks,
+    reject_unauth_destination
+
+# Header modifications
+header_checks = regexp:/etc/postfix/header_checks
+
+# -------------------------------------------------------
+# Logging
+# -------------------------------------------------------
+maillog_file = /dev/stdout
