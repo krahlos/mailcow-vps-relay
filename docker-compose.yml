@@ -15,7 +15,8 @@ services:
       - postfix-queue:/var/spool/postfix
       - postfix-logs:/var/log/postfix
     depends_on:
-      - certbot
+      certbot:
+        condition: service_healthy
 
   certbot:
     image: certbot/certbot:v5.5.0
@@ -28,6 +29,12 @@ services:
       - letsencrypt:/etc/letsencrypt
       - ./certbot/renew.sh:/renew.sh:ro
     entrypoint: ["/bin/sh", "/renew.sh"]
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /etc/letsencrypt/live/$${RELAY_HOSTNAME}/fullchain.pem"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
 
   postfix-exporter:
     image: ghcr.io/hsn723/postfix_exporter:0.19.0

@@ -22,12 +22,6 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Certbot obtains the TLS certificate on first start. Restart postfix once it is ready:
-
-```bash
-docker compose restart postfix
-```
-
 ## Requirements
 
 - VPS with a public IPv4 and IPv6, ports 25 and 80 unblocked
