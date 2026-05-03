@@ -14,9 +14,6 @@ fi
 envsubst < /etc/postfix/transport.tmpl > /etc/postfix/transport
 postmap /etc/postfix/transport
 
-# Build helo_access hash map
-postmap /etc/postfix/helo_access
-
 # Start syslog daemon writing to file (for postfix-exporter)
 # then tail the file to stdout so docker logs still works
 mkdir -p /var/log/postfix
