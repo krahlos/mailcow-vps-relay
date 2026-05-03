@@ -2,45 +2,49 @@
 
 # mailcow-vps-relay
 
+[![Version](https://img.shields.io/github/v/release/krahlos/matrix-webhook-bridge)](https://github.com/krahlos/matrix-webhook-bridge/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-_Mail relay on a public VPS bridging the internet and a
-[Mailcow](https://mailcow.email) instance behind CGNAT/DS-Lite over IPv6. Includes
-automatic TLS via Let's Encrypt and Prometheus metrics._
+_Mail relay on a public VPS bridging the internet and a [Mailcow](https://mailcow.email)
+instance behind CGNAT/DS-Lite over IPv6. Includes automatic TLS via Let's Encrypt and
+Prometheus metrics._
 
 </div>
 
 ---
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for a full design overview.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for design overview and [INSTALL.md](INSTALL.md) for
+full setup instructions.
 
 ## Quick start
 
 ```bash
+git clone https://github.com/krahlos/mailcow-vps-relay.git /opt/mailcow-vps-relay
+cd /opt/mailcow-vps-relay
 cp .env.example .env
 # edit .env — set RELAY_HOSTNAME, RELAY_DOMAINS, MAILCOW_IPV6, ACME_EMAIL
-docker compose up -d --build
+
+sudo ln -s /opt/mailcow-vps-relay/systemd/mailcow-vps-relay.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now mailcow-vps-relay
 ```
 
-## Requirements
+## Management
 
-- VPS with a public IPv4 and IPv6, ports 25 and 80 unblocked
-- Mailcow reachable on IPv6 port 25 from the VPS
-- VPS IPv6 added to Mailcow's `mynetworks`
-- PTR record for the VPS IP matching `RELAY_HOSTNAME`
+```bash
+sudo systemctl status mailcow-vps-relay
+sudo systemctl restart mailcow-vps-relay
+docker compose -f /opt/mailcow-vps-relay/docker-compose.yml logs -f
+```
 
 ## Monitoring
 
-Prometheus metrics are exposed at `http://<vps>:9154/metrics` (localhost-only by default).
+Prometheus metrics at `http://<vps>:9154/metrics` (localhost-only by default).
 
-## Future improvements
+## Roadmap
 
-- [x] **Inbound TLS (STARTTLS):** Certbot sidecar container, certificate mounted as a
-  shared volume, `smtpd_tls_*` directives activated in `main.cf`.
-- [x] **Monitoring:** Postfix metrics via `postfix-exporter` for Prometheus scraping.
-- [ ] **Fail2Ban:** Brute-force protection on port 25 via a dedicated container.
-- [ ] **Rspamd pre-filter:** Spam filtering on the VPS before forwarding to Mailcow,
-  reducing load on the Mailcow instance.
-- [ ] **Outbound relay path:** Configure Mailcow to route outbound mail through the VPS
-  via `relayhost = [mail.example.com]:587`, removing the need for Mailcow to maintain
-  its own IPv4 sending reputation.
+- [x] Inbound STARTTLS via Certbot sidecar
+- [x] Postfix metrics via `postfix-exporter`
+- [ ] Fail2Ban container for port 25 brute-force protection
+- [ ] Rspamd pre-filter before forwarding to Mailcow
+- [ ] Outbound relay path (`relayhost = [mail.example.com]:587`)
