@@ -17,6 +17,13 @@ postmap /etc/postfix/transport
 # Render helo_access from template (texthash: reads plain text directly)
 envsubst < /etc/postfix/helo_access.tmpl > /etc/postfix/helo_access
 
+# Create SASL credentials for submission (mailcow outbound relay)
+if [ -n "${SUBMISSION_USER}" ] && [ -n "${SUBMISSION_PASS}" ]; then
+    printf '%s' "${SUBMISSION_PASS}" | saslpasswd2 -p -c -u "${RELAY_HOSTNAME}" "${SUBMISSION_USER}"
+    chown root:postfix /etc/sasl2/sasldb2
+    chmod 640 /etc/sasl2/sasldb2
+fi
+
 # Start syslog daemon writing to file (for postfix-exporter)
 # then tail the file to stdout so docker logs still works
 mkdir -p /var/log/postfix
