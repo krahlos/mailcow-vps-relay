@@ -2,7 +2,7 @@
 
 # mailcow-vps-relay
 
-[![Version](https://img.shields.io/github/v/release/krahlos/matrix-webhook-bridge)](https://github.com/krahlos/matrix-webhook-bridge/releases/latest)
+[![Version](https://img.shields.io/github/v/release/krahlos/mailcow-vps-relay)](https://github.com/krahlos/mailcow-vps-relay/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 _Mail relay on a public VPS bridging the internet and a [Mailcow](https://mailcow.email)
