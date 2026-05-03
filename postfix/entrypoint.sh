@@ -1,6 +1,11 @@
 #!/bin/sh
 set -e
 
+if [ -z "${RELAY_HOSTNAME}" ]; then
+    echo "ERROR: RELAY_HOSTNAME must be set"
+    exit 1
+fi
+
 # Render main.cf from template
 envsubst < /etc/postfix/main.cf.tmpl > /etc/postfix/main.cf
 
