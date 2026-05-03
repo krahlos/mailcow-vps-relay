@@ -34,16 +34,20 @@ runs:
               --auth LOGIN --auth-user mailcow --auth-password change-me \
               --quit-after AUTH --tls-protocol none
 
-        # Verify success in logs
-        docker compose logs postfix | grep -q "Authentication successful"
+        # Give logs time to flush
+        sleep 2
+        # Verify success in logs (Postfix logs the sasl_username on success)
+        docker compose logs postfix | grep -q "sasl_username=mailcow"
 
-    - name: Run Inbound Acceptance Test
-      shell: bash
-      run: |
+        - name: Run Inbound Acceptance Test
+        shell: bash
+        run: |
         swaks --to test@example.com --server 127.0.0.1 --port 25 --quit-after RCPT
 
-        # Verify connection in logs
-        docker compose logs postfix | grep -q "connect from unknown"
+        # Give logs time to flush
+        sleep 2
+        # Verify relay acceptance in logs
+        docker compose logs postfix | grep -q "smtpd.*connect from unknown"
 
     - name: Logs on failure
       if: failure()
