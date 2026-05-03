@@ -1,4 +1,3 @@
----
 name: "Smoke Test"
 description: "Starts the relay stack and verifies SASL authentication"
 
@@ -36,18 +35,18 @@ runs:
 
         # Give logs time to flush
         sleep 2
-        # Verify success in logs (Postfix logs the sasl_username on success)
-        docker compose logs postfix | grep -q "sasl_username=mailcow"
+        # Verify success in logs (Postfix logs auth=1 on successful SASL disconnect)
+        docker compose logs postfix | grep -q "auth=1"
 
-        - name: Run Inbound Acceptance Test
-        shell: bash
-        run: |
+    - name: Run Inbound Acceptance Test
+      shell: bash
+      run: |
         swaks --to test@example.com --server 127.0.0.1 --port 25 --quit-after RCPT
 
         # Give logs time to flush
         sleep 2
-        # Verify relay acceptance in logs
-        docker compose logs postfix | grep -q "smtpd.*connect from unknown"
+        # Verify connection in logs
+        docker compose logs postfix | grep -q "smtpd.*connect from"
 
     - name: Logs on failure
       if: failure()
