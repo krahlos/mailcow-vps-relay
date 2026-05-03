@@ -52,6 +52,13 @@ services:
     depends_on:
       - postfix
 
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: fd00:dead:beef::/64
+
 volumes:
   postfix-queue:
     name: mailcow-vps-relay-postfix-queue
