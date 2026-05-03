@@ -10,7 +10,7 @@ if [ -f "$CERT" ]; then
     sed -i 's/^##TLS## //' /etc/postfix/main.cf
 fi
 
-# Render transport map from template and build hash
+# Render transport map from template and build lmdb
 envsubst < /etc/postfix/transport.tmpl > /etc/postfix/transport
 postmap /etc/postfix/transport
 

@@ -21,7 +21,7 @@ inet_protocols = all
 relay_domains = ${RELAY_DOMAINS}
 
 # Transport map: domain → target MTA
-transport_maps = hash:/etc/postfix/transport
+transport_maps = lmdb:/etc/postfix/transport
 
 # Trusted networks (localhost only, no open relay!)
 mynetworks = 127.0.0.0/8 [::1]/128
