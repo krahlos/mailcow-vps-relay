@@ -9,7 +9,7 @@ services:
       - "[::]:25:25"
     volumes:
       - ./postfix/transport.tmpl:/etc/postfix/transport.tmpl:ro
-      - ./postfix/helo_access:/etc/postfix/helo_access:ro
+      - ./postfix/helo_access.tmpl:/etc/postfix/helo_access.tmpl:ro
       - ./postfix/header_checks:/etc/postfix/header_checks:ro
       - letsencrypt:/etc/letsencrypt:ro
       - postfix-queue:/var/spool/postfix
