@@ -1,0 +1,155 @@
+---
+
+name: "Publish Release"
+run-name: "Release ${{ inputs.version }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (vX.Y.Z)"
+        required: true
+        type: string
+      prerelease:
+        description: "Mark as pre-release"
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  validate-version:
+    name: Validate Version
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - name: Validate version format
+        run: |
+          if [[ ! "${{ inputs.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: version '${{ inputs.version }}' does not match vX.Y.Z format"
+            exit 1
+          fi
+          echo "Version ${{ inputs.version }} is valid"
+
+  bump-version:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    needs: validate-version
+    outputs:
+      sha: ${{ steps.bump.outputs.sha }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.RELEASE_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install tbump
+        run: pip install tbump
+
+      - name: Run tbump
+        id: bump
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name "${{ vars.GIT_USER_NAME }}"
+          git config user.email "${{ vars.GIT_USER_EMAIL }}"
+
+          # Remove 'v' prefix for tbump
+          VERSION_NO_V="${VERSION#v}"
+
+          tbump "${VERSION_NO_V}" --non-interactive
+
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  run-tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: bump-version
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pip install ".[test]"
+
+      - name: Run tests
+        run: pytest
+
+  smoke-test:
+    name: Smoke Test
+    runs-on: ubuntu-latest
+    needs: run-tests
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+      - name: Run Smoke Test
+        uses: ./.github/actions/smoke_test
+
+  publish-image:
+    name: Publish Image
+    runs-on: ubuntu-latest
+    needs: [run-tests, bump-version, smoke-test]
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+
+      - name: Set Build Metadata
+        id: meta
+        run: |
+          echo "date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$GITHUB_OUTPUT"
+
+      - name: Publish image
+        uses: ./.github/actions/publish_image
+        with:
+          registry: ghcr.io
+          image_name: ${{ github.repository }}
+          version: ${{ inputs.version }}
+          maintainer: ${{ vars.MAINTAINER }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sha: ${{ needs.bump-version.outputs.sha }}
+          build_date: ${{ steps.meta.outputs.date }}
+          server_url: ${{ github.server_url }}
+
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: publish-image
+    steps:
+      - name: Create GitHub Release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: '${{ inputs.version }}',
+              name: '${{ inputs.version }}',
+              generate_release_notes: true,
+              prerelease: ${{ inputs.prerelease }},
+            });
