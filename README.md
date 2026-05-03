@@ -13,8 +13,8 @@ Prometheus metrics._
 
 ---
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for design overview and [INSTALL.md](INSTALL.md) for
-full setup instructions.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for design overview, [INSTALL.md](INSTALL.md) for
+full setup instructions, and [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common connectivity issues.
 
 ## Quick start
 

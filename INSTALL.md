@@ -50,11 +50,14 @@ Mailcow UI → System → Configuration → Options → Additional Postfix mynet
 
 Save, then restart Postfix (Mailcow UI → Configuration → Restart services).
 
-**Verify port 25 is reachable over IPv6** from the VPS after the stack is up:
+**Verify port 25 (or your chosen MAILCOW_PORT) is reachable over IPv6** from the VPS after the
+stack is up:
 
 ```bash
-nc -zv <MAILCOW_IPV6> 25
+nc -zv <MAILCOW_IPV6> <MAILCOW_PORT>
 ```
+
+If you encounter `Network unreachable` or `Connection refused`, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ## Testing
 
