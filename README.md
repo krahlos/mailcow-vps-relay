@@ -4,9 +4,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-_Postfix relay running on a public VPS that forwards inbound mail over IPv6 to a
-[Mailcow](https://mailcow.email) instance behind CGNAT/DS-Lite. Includes automatic
-TLS via Let's Encrypt_
+_Mail relay on a public VPS bridging the internet and a
+[Mailcow](https://mailcow.email) instance behind CGNAT/DS-Lite over IPv6. Includes
+automatic TLS via Let's Encrypt and Prometheus metrics._
 
 </div>
 
@@ -32,3 +32,15 @@ docker compose up -d --build
 ## Monitoring
 
 Prometheus metrics are exposed at `http://<vps>:9154/metrics` (localhost-only by default).
+
+## Future improvements
+
+- [x] **Inbound TLS (STARTTLS):** Certbot sidecar container, certificate mounted as a
+  shared volume, `smtpd_tls_*` directives activated in `main.cf`.
+- [x] **Monitoring:** Postfix metrics via `postfix-exporter` for Prometheus scraping.
+- [ ] **Fail2Ban:** Brute-force protection on port 25 via a dedicated container.
+- [ ] **Rspamd pre-filter:** Spam filtering on the VPS before forwarding to Mailcow,
+  reducing load on the Mailcow instance.
+- [ ] **Outbound relay path:** Configure Mailcow to route outbound mail through the VPS
+  via `relayhost = [mail.example.com]:587`, removing the need for Mailcow to maintain
+  its own IPv4 sending reputation.
