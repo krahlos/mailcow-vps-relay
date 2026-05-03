@@ -54,5 +54,8 @@ services:
 
 volumes:
   postfix-queue:
+    name: mailcow-vps-relay-postfix-queue
   postfix-logs:
+    name: mailcow-vps-relay-postfix-logs
   letsencrypt:
+    name: mailcow-vps-relay-letsencrypt
