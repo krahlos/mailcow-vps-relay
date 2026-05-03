@@ -29,10 +29,10 @@ All records must be consistent — mismatches cause rejection.
 
 | Record | Example |
 | ------ | ------- |
-| `A` | `mail.example.com → <VPS IPv4>` |
-| `AAAA` | `mail.example.com → <VPS IPv6>` |
-| `MX` | `example.com MX 10 mail.example.com` |
-| PTR | `<VPS IPv4> → mail.example.com` (set in VPS provider console) |
+| `A` | `relay.example.com → <VPS IPv4>` |
+| `AAAA` | `relay.example.com → <VPS IPv6>` |
+| `MX` | `example.com MX 10 relay.example.com` |
+| PTR | `<VPS IPv4> → relay.example.com` (set in VPS provider console) |
 | SPF | `example.com TXT "v=spf1 mx ~all"` |
 
 `RELAY_HOSTNAME` in `.env` must exactly match the PTR record and the A/AAAA hostname.
@@ -60,7 +60,7 @@ nc -zv <MAILCOW_IPV6> 25
 
 ```bash
 swaks --to test@example.com \
-      --server mail.example.com \
+      --server relay.example.com \
       --port 25 \
       --helo test.example.com
 ```

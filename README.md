@@ -47,4 +47,4 @@ Prometheus metrics at `http://<vps>:9154/metrics` (localhost-only by default).
 - [x] Postfix metrics via `postfix-exporter`
 - [ ] Fail2Ban container for port 25 brute-force protection
 - [ ] Rspamd pre-filter before forwarding to Mailcow
-- [ ] Outbound relay path (`relayhost = [mail.example.com]:587`)
+- [ ] Outbound relay path (`relayhost = [relay.example.com]:587`)

@@ -63,7 +63,7 @@ Metrics at `http://<vps>:9154/metrics`. Port bound to `127.0.0.1` by default.
 
 | Record | Value |
 | ------ | ----- |
-| MX | `mail.example.com` |
+| MX | `relay.example.com` |
 | A/AAAA | VPS IPv4/IPv6 |
 | PTR | Must match `RELAY_HOSTNAME` |
 | SPF | Include VPS IPv4, VPS IPv6, Mailcow home IPv6 |
