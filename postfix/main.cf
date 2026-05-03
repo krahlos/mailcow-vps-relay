@@ -53,7 +53,6 @@ smtpd_sasl_type = cyrus
 smtpd_sasl_path = smtpd
 smtpd_sasl_local_domain = $myhostname
 smtpd_sasl_security_options = noanonymous
-broken_sasl_auth_clients = yes
 
 # -------------------------------------------------------
 # Basic anti-spam (avoid generating backscatter)
