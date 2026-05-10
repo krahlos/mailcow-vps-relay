@@ -1,0 +1,54 @@
+name: "Smoke Test"
+description: "Starts the relay stack and verifies SASL authentication"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup environment
+      shell: bash
+      run: |
+        cp .env.example .env
+        sed -i 's/MAILCOW_IPV6=.*/MAILCOW_IPV6=127.0.0.1/' .env
+
+    - name: Start Postfix
+      shell: bash
+      run: |
+        docker compose up -d --build --no-deps postfix
+        # Wait for Postfix to start and generate SASL DB
+        sleep 5
+
+    - name: Install swaks
+      shell: bash
+      run: sudo apt-get update && sudo apt-get install -y swaks
+
+    - name: Run Outbound SASL Test
+      shell: bash
+      run: |
+        # Downgrade TLS for local auth test
+        docker compose exec -T postfix postconf -P "submission/inet/smtpd_tls_security_level=may"
+        docker compose exec -T postfix postfix reload
+        sleep 2
+
+        swaks --to user@example.com --server 127.0.0.1 --port 587 \
+              --auth LOGIN --auth-user mailcow --auth-password change-me \
+              --quit-after AUTH --tls-protocol none
+
+        # Give logs time to flush
+        sleep 2
+        # Verify success in logs (Postfix logs auth=1 on successful SASL disconnect)
+        docker compose logs postfix | grep -q "auth=1"
+
+    - name: Run Inbound Acceptance Test
+      shell: bash
+      run: |
+        swaks --to test@example.com --server 127.0.0.1 --port 25 --quit-after RCPT
+
+        # Give logs time to flush
+        sleep 2
+        # Verify connection in logs
+        docker compose logs postfix | grep -q "smtpd.*connect from"
+
+    - name: Logs on failure
+      if: failure()
+      shell: bash
+      run: docker compose logs postfix

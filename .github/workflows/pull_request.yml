@@ -85,3 +85,16 @@ jobs:
             IMAGE_REVISION=${{ github.sha }}
             BUILD_DATE=${{ steps.meta.outputs.build_date }}
             SOURCE_URL=${{ github.server_url }}/${{ github.repository }}
+
+  smoke-test:
+    name: Smoke Test
+    needs: build-image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Smoke Test
+        uses: ./.github/actions/smoketest

@@ -82,6 +82,6 @@ Prometheus metrics at `http://<vps>:9154/metrics` (localhost-only by default).
 - [x] Postfix metrics via `postfix-exporter`
 - [ ] Fail2Ban container for port 25 brute-force protection
 - [ ] Rspamd pre-filter before forwarding to Mailcow
+- [x] Outbound relay path (`relayhost = [relay.example.com]:587`)
 - [ ] IMAP proxy (ports 143/993) for mail clients behind CGNAT
 - [ ] WireGuard tunnel as alternative VPS↔Mailcow transport (for setups without IPv6)
-- [ ] Outbound relay path (`relayhost = [relay.example.com]:587`)

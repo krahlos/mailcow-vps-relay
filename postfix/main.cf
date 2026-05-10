@@ -47,6 +47,14 @@ smtp_tls_security_level = may
 smtp_tls_loglevel = 1
 
 # -------------------------------------------------------
+# SASL (used by submission/smtps listeners in master.cf)
+# -------------------------------------------------------
+smtpd_sasl_type = cyrus
+smtpd_sasl_path = smtpd
+smtpd_sasl_local_domain = $myhostname
+smtpd_sasl_security_options = noanonymous
+
+# -------------------------------------------------------
 # Basic anti-spam (avoid generating backscatter)
 # -------------------------------------------------------
 smtpd_helo_required = yes
