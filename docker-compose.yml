@@ -19,15 +19,14 @@ services:
         condition: service_healthy
 
   certbot:
-    image: certbot/certbot:v5.5.0
+    build: ./certbot
     container_name: mailcow-vps-relay-certbot
     restart: unless-stopped
     env_file: .env
-    ports:
-      - "0.0.0.0:80:80"
     volumes:
       - letsencrypt:/etc/letsencrypt
       - ./certbot/renew.sh:/renew.sh:ro
+      - ./certbot/providers:/providers:ro
     entrypoint: ["/bin/sh", "/renew.sh"]
     healthcheck:
       test: ["CMD-SHELL", "test -f /etc/letsencrypt/live/$${RELAY_HOSTNAME}/fullchain.pem"]
