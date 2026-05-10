@@ -14,7 +14,7 @@ CGNAT/DS-Lite. Outbound mail leaves Mailcow directly via IPv6.
 | Component | Role |
 | --------- | ---- |
 | `postfix` | Accepts inbound SMTP, relays to Mailcow via IPv6 |
-| `certbot` | Obtains and renews Let's Encrypt TLS cert via standalone HTTP |
+| `certbot` | Obtains and renews Let's Encrypt TLS cert via Cloudflare DNS-01 |
 | `postfix-exporter` | Exposes Postfix metrics on port 9154 |
 | `transport.tmpl` | Maps relay domains to `smtp:[MAILCOW_IPV6]:PORT` |
 | `helo_access` | Rejects forged HELO using own hostname |
@@ -29,10 +29,11 @@ CGNAT/DS-Lite. Outbound mail leaves Mailcow directly via IPv6.
 
 ## TLS
 
-Certbot runs as a sidecar using standalone HTTP (`--standalone`, port 80). Certificate stored
-in shared `letsencrypt` volume. On startup, `entrypoint.sh` activates `smtpd_tls_*` directives
-if the cert exists. Renewal runs every 12 hours; contacts Let's Encrypt only when within 30 days
-of expiry.
+Certbot runs as a sidecar using the Cloudflare DNS-01 challenge (`--dns-cloudflare`). It
+binds no host ports, so a reverse proxy (Gerbil/Traefik) can permanently own host 80/443.
+Certificate stored in shared `letsencrypt` volume. On startup, `entrypoint.sh` activates
+`smtpd_tls_*` directives if the cert exists. Renewal runs every 12 hours; contacts Let's
+Encrypt only when within 30 days of expiry.
 
 After renewal:
 

@@ -14,18 +14,50 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      HADOLINT_VERSION: v2.14.0
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install hadolint
+        run: |
+          sudo curl -sSfL -o /usr/local/bin/hadolint \
+            "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64"
+          sudo chmod +x /usr/local/bin/hadolint
+          hadolint --version
+
       - name: Run pre-commit hooks
         uses: pre-commit/action@v3.0.1
+
+  dispatcher-tests:
+    name: DNS Dispatcher Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run DNS provider dispatcher tests
+        run: bash tools/test_helpers/test_dns_dispatch.sh
 
   build-image:
     name: Build Image
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: postfix
+            context: ./postfix
+            file: postfix/Dockerfile
+          - name: certbot
+            context: ./certbot
+            file: certbot/Dockerfile
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -41,11 +73,11 @@ jobs:
             echo "build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Build image
+      - name: Build ${{ matrix.name }} image
         uses: docker/build-push-action@v6
         with:
-          context: ./postfix
-          file: postfix/Dockerfile
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
           push: false
           build-args: |
             VERSION=${{ steps.meta.outputs.image_version }}

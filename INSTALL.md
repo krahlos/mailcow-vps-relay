@@ -2,7 +2,8 @@
 
 ## Requirements
 
-- VPS with public IPv4 and IPv6, ports 25 and 80 unblocked
+- VPS with public IPv4 and IPv6, port 25 unblocked
+- `RELAY_HOSTNAME` on a Cloudflare-managed DNS zone (DNS-01 ACME challenge)
 - Mailcow reachable on IPv6 port 25 from the VPS
 - VPS IPv6 added to Mailcow's `mynetworks`
 - PTR record for the VPS IP matching `RELAY_HOSTNAME`
@@ -36,7 +37,9 @@ All records must be consistent — mismatches cause rejection.
 | SPF | `example.com TXT "v=spf1 mx ~all"` |
 
 `RELAY_HOSTNAME` in `.env` must exactly match the PTR record and the A/AAAA hostname.
-Certbot uses HTTP-01 and requires the A record to resolve to the VPS.
+Certbot uses the Cloudflare DNS-01 challenge — no inbound HTTP port is required, but
+`RELAY_HOSTNAME`'s zone must be hosted on Cloudflare and `CLOUDFLARE_API_TOKEN` must
+hold a token with `Zone:DNS:Edit` on that zone.
 
 ## Mailcow configuration
 
